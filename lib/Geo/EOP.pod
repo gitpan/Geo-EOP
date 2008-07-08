@@ -1,0 +1,199 @@
+=head1 NAME
+
+Geo::EOP - Earth Observation Products EOP (formely HMA)
+
+=head1 INHERITANCE
+
+ Geo::EOP
+   is a XML::Compile::Cache
+
+=head1 SYNOPSIS
+
+ use Geo::EOP ':eop1.1';
+
+ my $eop = Geo::EOP->new('READER', version => '1.1');
+
+ # see XML::Compile::Cache on how to use readers and writers
+ my $data = $eop->reader("gml:GridCoverage")->($xmlmsg);
+ my $xml  = $eop->writer($sometype)->($doc, $perldata);
+
+ # or without help of the cache, XML::Compile::Schema
+ my $r    = $gml->compile(READER => $sometype);
+ my $data = $r->($xml);
+
+ # huge overview on all defined elements
+ $gml->printIndex;
+
+=head1 DESCRIPTION
+
+Provides access to the EOP definitions specified in XML, which is
+based on GML.  Up to version 1.0, these schemas where named 'HMA'
+(Heterogeneous EO Missions Accessibility), and the development is
+still part of these ESA efforts for standardization.
+
+BE WARNED that HMA1.0 and EOP 1.1/1.2 are only using a B<subset> of GML
+version 3.1.1, due to problems with some software tools.  This limitation
+will probably be removed in 1.3 (or whatever the next version will
+be named).  EOP version 1.2-beta as defined here, is expected to become
+the final 1.2 in December 2008, with only minor modifications.
+
+The first releases of this module will not powerful, but hopefully
+people contribute.  For instance, an example conversion script between
+various versions is very welcome!  It would be nice to help each other.
+I will clean-up the implementation, to make it publishable, but do not
+have the knowledge about what is needed.
+
+=head1 METHODS
+
+=head2 Constructors
+
+Geo::EOP-E<gt>B<new>('READER'|'WRITER'|'RW', OPTIONS)
+
+=over 4
+
+ Option          --Default
+ allow_undeclared  <true>
+ prefixes          undef
+ units             <none>
+ version           <required>
+
+. allow_undeclared => BOOLEAN
+
+=over 4
+
+In the optimal case, all types used in your application are declared
+during the initiation phase of your program.  This will make it easy
+to write a fast daemon application, or transform your program into a
+daemon later.  So: "false" would be a good setting.  However, on the moment,
+the developer of this module has no idea which types people will use.
+Please help me with the specs!
+
+=back
+
+. prefixes => ARRAY|HASH
+
+=over 4
+
+Prefix abbreviations, to be used by cache object.  Which prefixes are
+defined depends on the schema version.
+
+=back
+
+. units => HASH
+
+=over 4
+
+See L</Units>.  Only if you specify your preference in units of measurement,
+some automatic translations will be performed.
+
+=back
+
+. version => VERSION|NAMESPACE
+
+=over 4
+
+Only used when the object is created directly from this base-class.  It
+determines which EOP syntax is to be used.  Can be a VERSION like "1.1"
+or a NAMESPACE URI like 'NS_EOP_11'.
+
+=back
+
+=back
+
+=head2 Accessors
+
+$obj-E<gt>B<direction>
+
+=over 4
+
+Returns 'READER', 'WRITER', or 'RW'.
+
+=back
+
+$obj-E<gt>B<printIndex>([FILEHANDLE], OPTIONS)
+
+=over 4
+
+List all the elements which can be produced with the schema.  By default,
+this only shows the elements and excludes the abstract elements from
+the list.  The selected FILEHANDLE is the default to print to.
+
+=back
+
+$obj-E<gt>B<version>
+
+=over 4
+
+EOP/HMA version, for instance '1.0'.
+
+=back
+
+=head1 DETAILS
+
+=head2 Units
+
+GML is careful about its units, which is nice but verbose.
+Therefore, this module gives you a way to set your preferences.
+The reader will simplify the structure, re-calculating the values
+found into the units of measure you prefer, according to UCUM
+(F<http://aurora.regenstrief.org/ucum>)
+
+  my $eop = Geo::EOP->new(...
+     , units => { distance => 'm'
+                , angle    => 'deg' }
+     );
+
+Available conversions:
+
+=over 4
+
+=item angle 'deg'|'rad'
+
+Will be applied to all AngleType elements
+
+=item distance 'm'
+
+Will be applied to all MeasureType elements
+
+=item percentage '%'|'float'
+
+Will be applied to all elements with a name ending on "Percentage".
+I am not sure about the C<float>... cannot find the uom name.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Geo-EOP distribution version 0.10,
+built on July 08, 2008. Website: F<http://perl.overmeer.net/geo/>
+All modules in this suite:
+L</Geo::GML>,
+L</Geo::ISO19139>,
+L</Geo::EOP>,
+L</Geo::Point>,
+L</Geo::Proj4>,
+L</Geo::WKT>, and
+L</Math::Polygon>.
+
+Please post questions or ideas to
+F<http://geo-perl@list.hut.fi|the Geo-Perl mailinglist>
+
+=head1 COPYRIGHTS
+
+=head2 License of the CODE
+
+Copyrights of the perl code and the related documentation by
+2008 by Mark Overmeer. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+
+=head2 License of the SCHEMAS
+
+The included schemas are copyrighted by the Open Geospatial Consortium, Inc.
+They are unmodified copied from the files at F<http://schemas.opengis.net>.
+Read OGCs disclaimer and copyright statements on documentation and software
+at F<http://www.opengeospatial.org/ogc/legal>.  The license text is also
+included in this CPAN distribution.
+
