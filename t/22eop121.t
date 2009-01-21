@@ -5,7 +5,7 @@ use strict;
 
 use lib 'lib';
 use Test::More tests => 7;
-#use Log::Report mode => 3;
+#use Log::Report mode => 3;    # debug
 
 use Geo::EOP;
 
@@ -15,17 +15,20 @@ $Data::Dumper::Quotekeys = 0;
 
 my $eop = Geo::EOP->new
   ( 'READER'
-  , eop_version => '1.1'
+  , eop_version => '1.2.1'
   , units => {angle => 'deg', distance => 'm', percentage => 'float'}
   );
 
 isa_ok($eop, 'Geo::EOP');
 
-my $dir = (-d 't' ? '.' : '..') . '/examples/eop1.1';
+my $dir = (-d 't' ? '.' : '..') . '/examples/eop1.2.1';
 
 ###### try example 1
 
-my $r1  = $eop->reader('eop:EarthObservation');
+my $r1  = $eop->reader('eop:EarthObservation'
+ , sloppy_floats   => 1
+ , sloppy_integers => 1
+ );
 isa_ok($r1, 'CODE', 'first example');
 
 my $d1 = $r1->("$dir/eop_example.xml");

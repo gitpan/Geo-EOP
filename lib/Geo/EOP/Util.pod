@@ -20,8 +20,6 @@ Defines the namespaces used with EOP.
 =head2 Constants
 
 All export tags defined NS_ATM_ESA, NS_SAR_ESA for EOP/HMA.
-Besides, for convenience NS_GML_311 and NS_XLINK_1999 (which are defined
-in Geo::GML::Util) are exported as well.
 
 The constants have names which end with C<_ESA>, because I expect them
 to move to the opengis name-space in the forseeable future.  Those new
@@ -39,10 +37,14 @@ Exports NS_OPT_ESA and NS_EOP_ESA as well.
 
 Same exports as C<:eop11>
 
+=head3 :eop121
+
+Same exports as C<:eop11>
+
 =head1 SEE ALSO
 
-This module is part of Geo-EOP distribution version 0.10,
-built on July 08, 2008. Website: F<http://perl.overmeer.net/geo/>
+This module is part of Geo-EOP distribution version 0.11,
+built on January 21, 2009. Website: F<http://perl.overmeer.net/geo/>
 All modules in this suite:
 L</Geo::GML>,
 L</Geo::ISO19139>,
@@ -60,7 +62,7 @@ F<http://geo-perl@list.hut.fi|the Geo-Perl mailinglist>
 =head2 License of the CODE
 
 Copyrights of the perl code and the related documentation by
-2008 by Mark Overmeer. For other contributors see ChangeLog.
+2008-2009 by Mark Overmeer. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

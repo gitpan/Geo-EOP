@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Geo-EOP
-version:             0.10
+version:             0.11
 abstract:            Earth Observation Products meta-data
 license:             perl
 author:              
@@ -11,8 +11,8 @@ requires:
     Geo::GML:                      0.12
     Test::More:                    0.54
     Test::Pod:                     1.00
-    XML::Compile:                  0.88
-    XML::Compile::Cache:           0.12
+    XML::Compile:                  1.00
+    XML::Compile::Cache:           0.90
 meta-spec:
     url:     http://module-build.sourceforge.net/META-spec-v1.3.html
     version: 1.3

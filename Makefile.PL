@@ -4,11 +4,11 @@ use 5.008;
 
 WriteMakefile
  ( NAME	 	=> 'Geo::EOP'
- , VERSION	=> '0.10'
+ , VERSION	=> '0.11'
  , PREREQ_PM    =>
    { Geo::GML      => 0.12
-   , XML::Compile  => 0.88
-   , XML::Compile::Cache => 0.12
+   , XML::Compile  => '1.00'
+   , XML::Compile::Cache => '0.90'
 
    , Test::More    => 0.54
    , Test::Pod     => '1.00'
@@ -27,6 +27,7 @@ sub MY::postamble { <<'__POSTAMBLE' }
 RAWDIR          = ../public_html/geo-eop/raw
 DISTDIR         = ../public_html/geo-eop/source
 LICENSE         = artistic
+EXTENDS		= ../XMLCompile:../XMLCache:../GeoGML
 
 # for POD
 FIRST_YEAR      = 2008

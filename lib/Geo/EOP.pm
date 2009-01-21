@@ -1,4 +1,4 @@
-# Copyrights 2008 by Mark Overmeer.
+# Copyrights 2008-2009 by Mark Overmeer.
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 1.05.
@@ -7,11 +7,12 @@ use strict;
 
 package Geo::EOP;
 use vars '$VERSION';
-$VERSION = '0.10';
+$VERSION = '0.11';
 
-use base 'XML::Compile::Cache';
+use base 'Geo::GML';
 
 use Geo::EOP::Util;   # all
+use Geo::GML::Util  qw/:gml311/;
 
 use Log::Report 'geo-eop', syntax => 'SHORT';
 use XML::Compile::Util  qw/unpack_type pack_type/;
@@ -20,24 +21,54 @@ use Math::Trig          qw/rad2deg deg2rad/;
 # map namespace always to the newest implementation of the protocol
 my %ns2version =
   ( &NS_HMA_ESA => '1.0'
-  , &NS_EOP_ESA => '1.1'
+  , &NS_EOP_ESA => '1.2.1'
   );
 
 # list all available versions
+# It is a pity that not all schema use the same prefixes... sometimes,
+# the dafault prefix is used... therefore, we have to configure all that
+# manually.
+
+my @stdprefs =   # will be different in the future
+ ( sar => NS_SAR_ESA
+ , atm => NS_ATM_ESA
+ , gml => NS_GML_311
+ );
+
 my %info =
   ( '1.0'     =>
-      { prefixes => {hma => NS_HMA_ESA, ohr => NS_OHR_ESA}
-      , schemas  => [ 'hma1.0/*.xsd' ] }
+      { prefixes    => {hma => NS_HMA_ESA, ohr => NS_OHR_ESA, @stdprefs}
+      , eop_schemas => [ 'hma1.0/{eop,sar,opt,atm}.xsd' ]
+      , gml_schemas => [ 'eop1.1/gmlSubset.xsd' ]
+      , gml_version => '3.1.1eop'
+      }
 
   , '1.1'     =>
-      { prefixes => {eop => NS_EOP_ESA, opt => NS_OPT_ESA}
-      , schemas  => [ 'eop1.1/*.xsd' ] }
+      { prefixes    => {eop => NS_EOP_ESA, opt => NS_OPT_ESA, @stdprefs}
+      , eop_schemas => [ 'eop1.1/{eop,sar,opt,atm}.xsd' ]
+      , gml_schemas => [ 'eop1.1/gmlSubset.xsd' ]
+      , gml_version => '3.1.1eop'
+      }
 
   , '1.2beta' =>
-      { prefixes => {eop => NS_EOP_ESA, opt => NS_OPT_ESA}
-      , schemas  => [ 'eop1.2beta/*.xsd'
-                    , 'eop1.1/gmlSubset.xsd'
-                    ] }
+      { prefixes    => {eop => NS_EOP_ESA, opt => NS_OPT_ESA, @stdprefs}
+      , eop_schemas => [ 'eop1.2beta/{eop,sar,opt,atm}.xsd' ]
+      , gml_schemas => [ 'eop1.1/gmlSubset.xsd' ]
+      , gml_version => '3.1.1eop'
+      }
+
+  , '1.2.1' =>
+      { prefixes    => {eop => NS_EOP_ESA, opt => NS_OPT_ESA, @stdprefs}
+      , eop_schemas => [ 'eop1.2.1/{eop,sar,opt,atm}.xsd' ]
+      , gml_schemas => [ 'eop1.2.1/gmlSubset.xsd' ]
+      , gml_version => '3.1.1eop'
+      }
+
+# , '2.0' =>
+#     { eop_schemas => [ 'eop2.0/*.xsd' ]
+#     , gml_version => '3.2.1'
+#     }
+
   );
 
 my %measure =
@@ -52,22 +83,13 @@ sub _convert_measure($@);
 my @declare_always = ();
 
 
-sub new($@)
-{   my ($class, $dir) = (shift, shift);
-    $class->SUPER::new(direction => $dir, @_);
-}
-
 sub init($)
 {   my ($self, $args) = @_;
     $args->{allow_undeclared} = 1
         unless exists $args->{allow_undeclared};
 
-    $self->SUPER::init($args);
-
-    $self->{GE_dir} = $args->{direction} or panic "no direction";
-
-    my $version     =  $args->{version}
-        or error __x"EOP object requires an explicit version";
+    my $version  =  $args->{eop_version}
+        or error __x"EOP object requires an explicit eop_version";
 
     unless(exists $info{$version})
     {   exists $ns2version{$version}
@@ -75,34 +97,36 @@ sub init($)
         $version = $ns2version{$version};
     }
     $self->{GE_version} = $version;    
-    my $info    = $info{$version};
+    my $info            = $info{$version};
 
-    $self->prefixes
-      ( xlink => NS_XLINK_1999, gml => NS_GML_311
-      , sar => NS_SAR_ESA, atm => NS_ATM_ESA
-      , %{$info->{prefixes}}
-      );
-    $self->addKeyRewrite('PREFIXED(sar,atm,ohr,opt)');
+    $args->{version}    = $info->{gml_version};
+    if($info->{gml_schemas})  # using own GML 3.1.1 subset
+    {   $self->_register_gml_version($info->{gml_version} => {});
+    }
+
+    $self->SUPER::init($args);
+
+    $self->prefixes($info->{prefixes});
 
     (my $xsd = __FILE__) =~ s!\.pm!/xsd!;
     my @xsds    = map {glob "$xsd/$_"}
-        @{$info->{schemas}}, 'xlink1.0.0/*.xsd';
+       @{$info->{eop_schemas} || []}, @{$info->{gml_schemas} || []};
 
     $self->importDefinitions(\@xsds);
 
     my $units = delete $args->{units};
     if($units)
-    {   if($units->{angle})
-        {   $self->addHook(type => pack_type(NS_GML_311, 'AngleType')
-               , after => sub { _convert_measure $units->{angle}, @_} );
+    {   if(my $a = $units->{angle})
+        {   $self->addHook(type => 'gml:AngleType'
+              , after => sub { _convert_measure $a, @_} );
         }
-        if($units->{distance})
-        {   $self->addHook(type => pack_type(NS_GML_311, 'MeasureType')
-               , after => sub { _convert_measure $units->{distance}, @_} );
+        if(my $d = $units->{distance})
+        {   $self->addHook(type => 'gml:MeasureType'
+              , after => sub { _convert_measure $d, @_} );
         }
-        if($units->{percentage})
+        if(my $p = $units->{percentage})
         {   $self->addHook(path => qr/Percentage/
-               , after => sub { _convert_measure $units->{percentage}, @_} );
+              , after => sub { _convert_measure $p, @_} );
         }
     }
 
@@ -123,8 +147,10 @@ sub declare(@)
 #---------------------------------
 
 
-sub version()   {shift->{GE_version}}
-sub direction() {shift->{GE_dir}}
+sub eopVersion() {shift->{GE_version}}
+
+
+#--------------
 
 
 sub printIndex(@)
@@ -134,9 +160,7 @@ sub printIndex(@)
       , kinds => 'element', list_abstract => 0, @_); 
 }
 
-#---------------------
 # This code will probaby move to Geo::GML
-
 sub _convert_measure($@)   # not $$$$ for right context
 {   my ($to, $node, $data, $path) = @_;
     ref $data eq 'HASH'  or return $data;

@@ -19,8 +19,6 @@ my @show_versions =
 
 foreach my $package (@show_versions)
 {   eval "require $package";
-warn $@ if $@;
-
     no strict 'refs';
     my $report
       = !$@    ? "version ". (${"package\::VERSION"} || 'unknown')
