@@ -1,11 +1,31 @@
 
 ======== version history of Geo::EOP
 
-version 0.11:
+version 0.12: Wed Jan 28 11:10:21 CET 2009
+
+	Changes:
+
+	- remove 'READER'|'WRITER'|'RW' first parameter from new()
+	  in Geo::EOP and Geo::EOP::Envisat.
+
+	Fixes:
+
+	- do not use /bin/pwd in t/99pod.t
+
+	Improvements:
+
+	- add Geo::EOP::from()
+
+	- included examples/read_eop.pl
+
+version 0.11: Wed Jan 21 12:43:57 CET 2009
 
 	Changes:
 
 	- Geo::EOP is now fully based on a Geo::GML object.
+
+	- Geo::GML uses prefixed keys, so Geo::EOP uses prefixed keys as
+	  well.
 
 	- version() and new(version) renamed to resp. eopVersion() and
 	  new(eop_version) to avoid clash with GML version.

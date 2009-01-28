@@ -1,6 +1,6 @@
 =head1 NAME
 
-Geo::EOP - Earth Observation Products EOP (formely HMA)
+Geo::EOP - Earth Observation Products EOP
 
 =head1 INHERITANCE
 
@@ -14,7 +14,7 @@ Geo::EOP - Earth Observation Products EOP (formely HMA)
 
  use Geo::EOP ':eop1.1';
 
- my $eop = Geo::EOP->new('READER', version => '1.1');
+ my $eop = Geo::EOP->new(eop_version => '1.1');
 
  # see XML::Compile::Cache on how to use readers and writers
  my $data = $eop->reader("gml:GridCoverage")->($xmlmsg);
@@ -23,6 +23,11 @@ Geo::EOP - Earth Observation Products EOP (formely HMA)
  # or without help of the cache, XML::Compile::Schema
  my $r    = $gml->compile(READER => $sometype);
  my $data = $r->($xml);
+
+ # read a eop data file.  Autodetects the version used.
+ my ($type, $data) = Geo::EOP->from('data.xml');
+ print "Root type:   $type\n";
+ print "EOP version: $data->{version}\n";
 
  # huge overview on all defined elements
  $gml->printIndex;
@@ -49,7 +54,27 @@ have the knowledge about what is needed.
 
 =head2 Constructors
 
-Geo::EOP-E<gt>B<new>('READER'|'WRITER'|'RW', OPTIONS)
+Geo::EOP-E<gt>B<from>(XMLDATA, OPTIONS)
+
+=over 4
+
+Read a EOP structure from a data source, which can be anything acceptable
+by L<dataToXML()|XML::Compile/"Compilers">: a XML::LibXML::Element, XML as string or ref-string,
+filename, filehandle or known namespace.
+
+Returned is the product (the type of the root node) and the parsed
+data-structure.  The EOP version used for decoding is autodetected,
+unless specified.
+
+See F<examples/read_eop.pl>
+
+example: 
+
+  my ($type, $data) = Geo::EOP->from('data.xml');
+
+=back
+
+Geo::EOP-E<gt>B<new>(OPTIONS)
 
 =over 4
 
@@ -201,15 +226,6 @@ EOP/HMA version, for instance '1.0'.
 
 =back
 
-$obj-E<gt>B<gml>
-
-=over 4
-
-Returns the related GML object.  Up to release 1.2.1, this is the
-current object.  Later, it will be an extern object, from L<Geo::GML|Geo::GML>.
-
-=back
-
 $obj-E<gt>B<hooks>
 
 =over 4
@@ -242,6 +258,14 @@ See L<XML::Compile::Cache/"Accessors">
 
 =back
 
+$obj-E<gt>B<useSchema>(SCHEMA, [SCHEMA])
+
+=over 4
+
+See L<XML::Compile::Schema/"Accessors">
+
+=back
+
 $obj-E<gt>B<version>
 
 =over 4
@@ -268,7 +292,7 @@ See L<XML::Compile::Cache/"Compilers">
 
 =back
 
-$obj-E<gt>B<dataToXML>(NODE|REF-XML-STRING|XML-STRING|FILENAME|FILEHANDLE|KNOWN)
+Geo::EOP-E<gt>B<dataToXML>(NODE|REF-XML-STRING|XML-STRING|FILENAME|FILEHANDLE|KNOWN)
 
 =over 4
 
@@ -337,6 +361,8 @@ See L<XML::Compile::Cache/"Administration">
 =back
 
 $obj-E<gt>B<findSchemaFile>(FILENAME)
+
+Geo::EOP-E<gt>B<findSchemaFile>(FILENAME)
 
 =over 4
 
@@ -455,8 +481,8 @@ Error: don't known how to interpret XML data
 
 =head1 SEE ALSO
 
-This module is part of Geo-EOP distribution version 0.11,
-built on January 21, 2009. Website: F<http://perl.overmeer.net/geo/>
+This module is part of Geo-EOP distribution version 0.12,
+built on January 28, 2009. Website: F<http://perl.overmeer.net/geo/>
 All modules in this suite:
 L</Geo::GML>,
 L</Geo::ISO19139>,

@@ -1,13 +1,13 @@
 # Copyrights 2008-2009 by Mark Overmeer.
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 1.05.
+# Pod stripped from pm file by OODoc 1.06.
 use warnings;
 use strict;
 
 package Geo::EOP;
 use vars '$VERSION';
-$VERSION = '0.11';
+$VERSION = '0.12';
 
 use base 'Geo::GML';
 
@@ -15,7 +15,7 @@ use Geo::EOP::Util;   # all
 use Geo::GML::Util  qw/:gml311/;
 
 use Log::Report 'geo-eop', syntax => 'SHORT';
-use XML::Compile::Util  qw/unpack_type pack_type/;
+use XML::Compile::Util  qw/unpack_type pack_type type_of_node/;
 use Math::Trig          qw/rad2deg deg2rad/;
 
 # map namespace always to the newest implementation of the protocol
@@ -83,6 +83,8 @@ sub _convert_measure($@);
 my @declare_always = ();
 
 
+sub new($@) { my $class = shift; $class->SUPER::new('RW', @_) }
+
 sub init($)
 {   my ($self, $args) = @_;
     $args->{allow_undeclared} = 1
@@ -144,11 +146,32 @@ sub declare(@)
     $self;
 }
 
+
+sub from($@)
+{   my ($class, $data, %args) = @_;
+    my $xml = XML::Compile->dataToXML($data);
+
+    my $product = type_of_node $xml;
+    my $version = $xml->getAttribute('version');
+    defined $version
+        or error __x"no version attribute in root element";
+
+    exists $info{$version}
+        or error __x"EOP version {version} not (yet) supported.  Upgrade Geo::EOP or inform author"
+             , version => $version;
+
+    my $self    = $class->new(eop_version => $version, %args);
+    my $r       = $self->reader($product);
+    defined $r
+        or error __x"do not understand root node {type}", type => $product;
+
+    ($product, $r->($xml));
+}
+
 #---------------------------------
 
 
 sub eopVersion() {shift->{GE_version}}
-
 
 #--------------
 

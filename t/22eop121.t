@@ -14,8 +14,7 @@ $Data::Dumper::Indent = 1;
 $Data::Dumper::Quotekeys = 0;
 
 my $eop = Geo::EOP->new
-  ( 'READER'
-  , eop_version => '1.2.1'
+  ( eop_version => '1.2.1'
   , units => {angle => 'deg', distance => 'm', percentage => 'float'}
   );
 
