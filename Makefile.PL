@@ -4,7 +4,7 @@ use 5.008;
 
 WriteMakefile
  ( NAME	 	=> 'Geo::EOP'
- , VERSION	=> '0.12'
+ , VERSION	=> '0.13'
  , PREREQ_PM    =>
    { Geo::GML            => 0.13
    , XML::Compile        => '1.00'

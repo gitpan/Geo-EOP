@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Geo-EOP
-version:             0.12
+version:             0.13
 abstract:            Earth Observation Products meta-data
 license:             perl
 author:              

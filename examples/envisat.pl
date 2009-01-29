@@ -8,7 +8,7 @@ use Geo::EOP::Envisat;
 my $version = '1.2.1';   # which EOP version to be created
 
 @ARGV==1
-   or die "ERROR: one filename required";
+   or die "ERROR: one filename required\n";
 
 my ($filename) = @ARGV;
 

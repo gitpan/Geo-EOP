@@ -1,6 +1,13 @@
 
 ======== version history of Geo::EOP
 
+version 0.13: Thu Jan 29 16:47:24 CET 2009
+
+	Improvements:
+
+	- add Geo::EOP::Landsat, which converts some Landsat product
+	  meta-data into the EOP structure.
+
 version 0.12: Wed Jan 28 11:10:21 CET 2009
 
 	Changes:

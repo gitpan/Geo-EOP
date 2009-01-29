@@ -34,10 +34,10 @@ Geo::EOP - Earth Observation Products EOP
 
 =head1 DESCRIPTION
 
-Provides access to the EOP definitions specified in XML, which is
-based on GML.  Up to version 1.0, these schemas where named 'HMA'
-(Heterogeneous EO Missions Accessibility), and the development is
-still part of these ESA efforts for standardization.
+Provides access to the EOP definitions specified as XML schemas, based
+on GML.  Up to version 1.0, these schemas where named 'HMA' (Heterogeneous
+EO Missions Accessibility), and the development is still part of these
+ESA efforts for standardization.
 
 BE WARNED that HMA1.0 and EOP 1.1/1.2 are only using a B<subset> of GML
 version 3.1.1, due to problems with some software tools.  This limitation
@@ -48,7 +48,7 @@ The first releases of this module will not powerful, but hopefully
 people contribute.  For instance, an example conversion script between
 various versions is very welcome!  It would be nice to help each other.
 I will clean-up the implementation, to make it publishable, but do not
-have the knowledge about what is needed.
+have the knowledge about needed to implement the converter itself.
 
 =head1 METHODS
 
@@ -481,8 +481,8 @@ Error: don't known how to interpret XML data
 
 =head1 SEE ALSO
 
-This module is part of Geo-EOP distribution version 0.12,
-built on January 28, 2009. Website: F<http://perl.overmeer.net/geo/>
+This module is part of Geo-EOP distribution version 0.13,
+built on January 29, 2009. Website: F<http://perl.overmeer.net/geo/>
 All modules in this suite:
 L</Geo::GML>,
 L</Geo::ISO19139>,

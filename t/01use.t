@@ -30,3 +30,6 @@ foreach my $package (@show_versions)
 
 use_ok('Geo::EOP::Util');
 use_ok('Geo::EOP');
+
+# Geo::EOP::Envisat and Geo::EOP::Landsat not tested, because
+# they depend on modules which are optional.

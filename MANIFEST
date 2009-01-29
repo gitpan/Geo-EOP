@@ -9,6 +9,7 @@ examples/eop1.2.1/eop_example.xml
 examples/eop1.2.1/opt_example.xml
 examples/eop1.2b/eop_example.xml
 examples/eop1.2b/opt_example.xml
+examples/landsat.pl
 examples/read_eop.pl
 lib/Geo/EOP.pm
 lib/Geo/EOP.pod

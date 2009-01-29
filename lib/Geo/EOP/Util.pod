@@ -43,8 +43,8 @@ Same exports as C<:eop11>
 
 =head1 SEE ALSO
 
-This module is part of Geo-EOP distribution version 0.12,
-built on January 28, 2009. Website: F<http://perl.overmeer.net/geo/>
+This module is part of Geo-EOP distribution version 0.13,
+built on January 29, 2009. Website: F<http://perl.overmeer.net/geo/>
 All modules in this suite:
 L</Geo::GML>,
 L</Geo::ISO19139>,
